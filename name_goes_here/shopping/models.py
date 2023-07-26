@@ -1,12 +1,29 @@
-import decimal
+from decimal import Decimal
 
+from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class OrderQuerySet(models.QuerySet):
+    def for_user(self, user):
+        return self.filter(user=user)
+
+    def get_or_create_cart(self, user):
+        return self.get_or_create(status=Order.Status.OPEN, user=user, defaults={"total_price": Decimal(0)})
+
+
 class Order(models.Model):
+    """
+    Represents order and cart at the same time
+    """
+
+    objects = OrderQuerySet.as_manager()
+
     class Status(models.TextChoices):
+        OPEN = "OP", _("open")
         PENDING = "PE", _("pending")
         DONE = "DO", _("done")
 
@@ -23,5 +40,17 @@ class OrderItem(models.Model):
     fee_price = models.DecimalField(max_digits=6, decimal_places=2)
 
     @property
-    def total_proce(self) -> decimal.Decimal:
+    def total_price(self) -> Decimal:
         return self.quantity * self.fee_price
+
+
+def get_item_model() -> models.Model:
+    """
+    Return the User model that is active in this project.
+    """
+    try:
+        return apps.get_model(settings.ITEM_MODEL, require_ready=False)
+    except ValueError:
+        raise ImproperlyConfigured("ITEM_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured("ITEM_MODEL refers to model '%s' that has not been installed" % settings.ITEM_MODEL)
