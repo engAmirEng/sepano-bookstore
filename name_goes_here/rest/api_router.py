@@ -28,5 +28,6 @@ app_name = "rest"
 urlpatterns = [
     path("", include(router.urls)),
     path("", include(orders_router.urls)),
+    path("", include("shopping.rest.urls")),
     # Other paths (maybe ApiViews)
 ]
