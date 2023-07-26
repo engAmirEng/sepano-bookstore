@@ -1,15 +1,15 @@
 from django.contrib.auth import get_user_model
 from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
-    CreateModelMixin,
-    DestroyModelMixin,
 )
 from rest_framework.viewsets import GenericViewSet
 
-from .serializers import AuthorSerializer, BookSerializer
 from ..models import Author, Book
+from .serializers import AuthorSerializer, BookSerializer
 
 User = get_user_model()
 
@@ -19,6 +19,7 @@ class AuthorViewSet(
 ):
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
+
 
 class BookViewSet(
     ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet

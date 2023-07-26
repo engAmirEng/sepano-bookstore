@@ -124,6 +124,7 @@ THIRD_PARTY_APPS = clean_ellipsis(
 
 LOCAL_APPS = [
     "name_goes_here.book",
+    "name_goes_here.shopping",
     "name_goes_here.users",
     # Your stuff: custom apps go here
 ]
