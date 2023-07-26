@@ -26,6 +26,7 @@ class OrderQuerySet(models.QuerySet):
             existing_ot.delete()
         OrderItem.objects.create_based_on_item(item=item, cart=cart, quantity=quantity)
         cart.refresh_from_db()
+        cart.recalculate_total_price()
         return cart
 
     def get_or_create_cart(self, user) -> "Order":
@@ -48,6 +49,17 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=7, decimal_places=2)
     status = models.CharField(max_length=4, choices=Status.choices)
     order_date = models.DateField(auto_now_add=True)
+
+    def recalculate_total_price(self):
+        """
+        call this after any orderitem changed
+        """
+        assert self.status == Order.Status.OPEN
+        total_price = 0
+        for i in self.order_orderitems.all():
+            total_price += i.total_price
+        self.total_price = total_price
+        self.save()
 
 
 class ItemProto(Protocol):

@@ -32,6 +32,7 @@ class CartSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(write_only=True)
     item = ItemRelatedField(write_only=True)
     items = OrderItemSerializer(many=True, read_only=True, source="order_orderitems")
+    total_price = serializers.DecimalField(read_only=True, max_digits=7, decimal_places=2)
 
     def create(self, validated_data):
         user = self.context["request"].user
