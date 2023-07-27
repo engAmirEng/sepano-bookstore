@@ -1,9 +1,11 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserSerializer
 
@@ -23,3 +25,18 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     def me(self, request):
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
+class TokenObtainPairAndSetSessionCookieView(TokenObtainPairView):
+    """
+    Log user in using django session auth in addition to returning JWT Tokens
+    """
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+        login(request, serializer.user)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
