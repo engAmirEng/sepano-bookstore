@@ -1,10 +1,11 @@
 from decimal import Decimal
-from typing import Protocol
+from typing import Optional, Protocol
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models, transaction
+from django.utils.translation import gettext as __
 from django.utils.translation import gettext_lazy as _
 
 
@@ -13,10 +14,12 @@ class OrderQuerySet(models.QuerySet):
         return self.filter(user=user)
 
     @transaction.atomic
-    def add_to_cart(self, user, item, quantity: int):
+    def add_to_cart(self, user, item: "ItemProto", quantity: int) -> (Optional["Order"], str | None):
         """
         Adds an item to the Cart(an Order with status of open)
         """
+        if quantity > item.stock_quantity:
+            return None, __("Limited in stock count")
         cart, is_created = self.get_or_create_cart(user=user)
         try:
             existing_ot = OrderItem.objects.filter(order=cart, item=item).get()
@@ -27,7 +30,7 @@ class OrderQuerySet(models.QuerySet):
         OrderItem.objects.create_based_on_item(item=item, cart=cart, quantity=quantity)
         cart.refresh_from_db()
         cart.recalculate_total_price()
-        return cart
+        return cart, None
 
     def get_or_create_cart(self, user) -> "Order":
         return self.get_or_create(status=Order.Status.OPEN, user=user, defaults={"total_price": Decimal(0)})
@@ -64,6 +67,7 @@ class Order(models.Model):
 
 class ItemProto(Protocol):
     price: int
+    stock_quantity: int
 
 
 class OrderItemQueryset(models.QuerySet):

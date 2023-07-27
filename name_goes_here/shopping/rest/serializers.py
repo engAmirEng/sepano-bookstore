@@ -36,5 +36,7 @@ class CartSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        cart = Order.objects.add_to_cart(user=user, **validated_data)
+        cart, err = Order.objects.add_to_cart(user=user, **validated_data)
+        if err is not None:
+            raise serializers.ValidationError(err)
         return cart
