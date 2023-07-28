@@ -7,6 +7,12 @@ description_goes_here
 
 License: GPLv3
 
+## Full api doc with swagger
+vist
+```djangourlpath
+/api/docs/
+```
+
 ## Basic Commands
 
 ### Setting Up Your Users
