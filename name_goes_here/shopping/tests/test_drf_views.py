@@ -27,7 +27,7 @@ class TestOrderViewSet:
         r = api_client.get("/api/orders/")
 
         assert r.status_code == status.HTTP_200_OK
-        assert [i["id"] for i in r.json()] == [i.pk for i in orders]
+        assert [i["id"] for i in r.json()["results"]] == [i.pk for i in orders]
 
         r = api_client.get(f"/api/orders/{orders[0].pk}/")
 
