@@ -6,6 +6,7 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
     UpdateModelMixin,
 )
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.viewsets import GenericViewSet
 
 from ..models import Author, Book
@@ -19,6 +20,7 @@ class AuthorViewSet(
 ):
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
 
 
 class BookViewSet(
@@ -26,3 +28,4 @@ class BookViewSet(
 ):
     serializer_class = BookSerializer
     queryset = Book.objects.all()
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
