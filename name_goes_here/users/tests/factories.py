@@ -35,7 +35,7 @@ class UserFactory(DjangoModelFactory):
         django_get_or_create = ["username"]
 
 
-def uer_with_perm_fac(permissions: Iterable["str"], model: type[models.Model]):
+def user_with_perm_fac(permissions: Iterable["str"], model: type[models.Model]):
     class UserWithPermissionFactory(UserFactory):
         @post_generation
         def user_permissions(self, create, extracted, **kwargs):

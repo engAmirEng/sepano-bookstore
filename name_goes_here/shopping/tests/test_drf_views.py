@@ -3,7 +3,7 @@ from rest_framework import status
 
 from name_goes_here.shopping.models import Order
 from name_goes_here.shopping.tests.factories import OrderFactory
-from name_goes_here.users.tests.factories import uer_with_perm_fac
+from name_goes_here.users.tests.factories import user_with_perm_fac
 
 pytestmark = pytest.mark.django_db
 
@@ -21,7 +21,7 @@ class TestOrderViewSet:
         assert r.status_code == status.HTTP_403_FORBIDDEN
 
     def test_read(self, orders, api_client):
-        user = uer_with_perm_fac(permissions=["view_order"], model=Order)()
+        user = user_with_perm_fac(permissions=["view_order"], model=Order)()
         api_client.force_authenticate(user=user)
 
         r = api_client.get("/api/orders/")
