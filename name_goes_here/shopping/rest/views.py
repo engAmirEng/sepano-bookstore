@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
-from ..models import Order, OrderItem
+from ..models import Order
 from .serializers import CartSerializer, OrderItemSerializer, OrderSerializer
 
 User = get_user_model()
@@ -23,7 +24,10 @@ class OrderItemViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = OrderItemSerializer
 
     def get_queryset(self):
-        return OrderItem.objects.filter(order_id=self.kwargs["orders_pk"])
+        order = get_object_or_404(
+            Order.objects.for_user(self.request.user).prefetch_related("order_orderitems"), pk=self.kwargs["orders_pk"]
+        )
+        return order.order_orderitems.all()
 
 
 class CardAPIView(APIView):
