@@ -21,7 +21,7 @@ class OrderViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = (DjangoFullModelPermissions,)
-    filter_backends = (OrderingFilter, )
+    filter_backends = (OrderingFilter,)
     ordering_fields = ("total_price", "status", "order_date")
 
     def get_permissions(self):
@@ -48,7 +48,6 @@ class OrderItemViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = (DjangoFullModelPermissions,)
     filter_backends = (OrderingFilter,)
     ordering_fields = ("fee_price", "quantity")
-
 
     def get_permissions(self):
         if self.action in ("mine_detail", "mine_list"):
