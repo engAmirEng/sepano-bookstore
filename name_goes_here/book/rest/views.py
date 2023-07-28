@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -10,6 +11,7 @@ from rest_framework.mixins import (
 from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.viewsets import GenericViewSet
 
+from ..filters import BookFilter
 from ..models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 
@@ -32,6 +34,7 @@ class BookViewSet(
     serializer_class = BookSerializer
     queryset = Book.objects.all()
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
-    filter_backends = (SearchFilter, OrderingFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    filterset_class = BookFilter
     search_fields = ("title", "description")
     ordering_fields = ("price", "stock_quantity", "publication_date")
