@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -20,6 +21,8 @@ class OrderViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = (DjangoFullModelPermissions,)
+    filter_backends = (OrderingFilter, )
+    ordering_fields = ("total_price", "status", "order_date")
 
     def get_permissions(self):
         if self.action in ("mine_detail", "mine_list"):
@@ -43,6 +46,9 @@ class OrderViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 class OrderItemViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = (DjangoFullModelPermissions,)
+    filter_backends = (OrderingFilter,)
+    ordering_fields = ("fee_price", "quantity")
+
 
     def get_permissions(self):
         if self.action in ("mine_detail", "mine_list"):
