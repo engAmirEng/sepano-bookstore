@@ -11,7 +11,7 @@ class BookQuerySet(ItemQuerySet):
         """
         Available books to sell
         """
-        return self.filter(stock_quantity__gt=0)
+        return self.all()
 
 
 class Book(AbstractItem):

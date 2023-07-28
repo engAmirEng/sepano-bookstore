@@ -28,7 +28,8 @@ class OrderQuerySet(models.QuerySet):
             pass
         else:
             existing_ot.delete()
-        OrderItem.objects.create_based_on_item(item=item, cart=cart, quantity=quantity)
+        if quantity > 0:
+            OrderItem.objects.create_based_on_item(item=item, cart=cart, quantity=quantity)
         cart.refresh_from_db()
         cart.recalculate_total_price()
         return cart, None

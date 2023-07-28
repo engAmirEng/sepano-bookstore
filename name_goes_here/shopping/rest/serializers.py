@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
@@ -29,7 +30,7 @@ class ItemRelatedField(serializers.RelatedField):
 
 class CartSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
-    quantity = serializers.IntegerField(write_only=True)
+    quantity = serializers.IntegerField(write_only=True, validators=[MinValueValidator(0)])
     item = ItemRelatedField(write_only=True)
     items = OrderItemSerializer(many=True, read_only=True, source="order_orderitems")
     total_price = serializers.DecimalField(read_only=True, max_digits=7, decimal_places=2)
