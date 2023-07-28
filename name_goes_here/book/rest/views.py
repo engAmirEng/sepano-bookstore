@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from rest_framework.filters import SearchFilter
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -21,6 +22,8 @@ class AuthorViewSet(
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ("name", "user__name", "user__username")
 
 
 class BookViewSet(
@@ -29,3 +32,5 @@ class BookViewSet(
     serializer_class = BookSerializer
     queryset = Book.objects.all()
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ("title", "description")
