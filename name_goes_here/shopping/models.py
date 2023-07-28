@@ -1,5 +1,6 @@
+import abc
 from decimal import Decimal
-from typing import Optional, Protocol
+from typing import Optional
 
 from django.apps import apps
 from django.conf import settings
@@ -14,7 +15,7 @@ class OrderQuerySet(models.QuerySet):
         return self.filter(user=user)
 
     @transaction.atomic
-    def add_to_cart(self, user, item: "ItemProto", quantity: int) -> (Optional["Order"], str | None):
+    def add_to_cart(self, user, item: "AbstractItem", quantity: int) -> (Optional["Order"], str | None):
         """
         Adds an item to the Cart(an Order with status of open)
         """
@@ -65,13 +66,8 @@ class Order(models.Model):
         self.save()
 
 
-class ItemProto(Protocol):
-    price: int
-    stock_quantity: int
-
-
 class OrderItemQueryset(models.QuerySet):
-    def create_based_on_item(self, item: ItemProto, quantity: int, cart: Order) -> "OrderItem":
+    def create_based_on_item(self, item: "AbstractItem", quantity: int, cart: Order) -> "OrderItem":
         """
         Creates an item to be added to the cart
         """
@@ -95,6 +91,25 @@ class OrderItem(models.Model):
     @property
     def total_price(self) -> Decimal:
         return self.quantity * self.fee_price
+
+
+class ItemQuerySet(abc.ABC, models.QuerySet):
+    @abc.abstractmethod
+    def sellable(self):
+        """
+        Available items to sell
+        """
+        pass
+
+
+class AbstractItem(models.Model):
+    objects = ItemQuerySet.as_manager()
+
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    stock_quantity = models.PositiveIntegerField()
+
+    class Meta:
+        abstract = True
 
 
 def get_item_model() -> models.Model:

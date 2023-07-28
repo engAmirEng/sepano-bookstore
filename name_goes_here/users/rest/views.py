@@ -31,6 +31,7 @@ class TokenObtainPairAndSetSessionCookieView(TokenObtainPairView):
     """
     Log user in using django session auth in addition to returning JWT Tokens
     """
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 

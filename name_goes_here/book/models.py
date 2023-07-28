@@ -3,8 +3,10 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils.translation import gettext_lazy as _
 
+from name_goes_here.shopping.models import AbstractItem, ItemQuerySet
 
-class BookQuerySet(models.QuerySet):
+
+class BookQuerySet(ItemQuerySet):
     def sellable(self):
         """
         Available books to sell
@@ -12,15 +14,13 @@ class BookQuerySet(models.QuerySet):
         return self.filter(stock_quantity__gt=0)
 
 
-class Book(models.Model):
+class Book(AbstractItem):
     objects = BookQuerySet.as_manager()
 
     title = models.CharField(max_length=255)
     author = models.ForeignKey("Author", on_delete=models.PROTECT, related_name="author_books")
-    price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     publication_date = models.DateField()
-    stock_quantity = models.PositiveIntegerField()
 
 
 class Author(models.Model):
